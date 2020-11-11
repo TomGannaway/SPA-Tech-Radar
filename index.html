@@ -1,114 +1,119 @@
 <HTML>
-  <head>
+<head>
     <title>PGR Tech Radar</title>
     <script src="https://d3js.org/d3.v6.min.js"></script>
-    <script src="../js/radar.js"></script>
+    <script src="../TechRadarPOC/js/radar.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="../js/papaparse.min.js"></script>
+    <script src="../TechRadarPOC/js/papaparse.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
+
     <script>
-      function drawRadar(myEntries) {
-        radar_visualization ({
-          svg_id: "radar",
-          width: 1450,
-          height: 1000,
-          colors: {
-            background: "#fff",
-            grid: "#bbb",
-            inactive: "#ddd"
-          },
+        function drawRadar(myEntries) {
+            radar_visualization({
+                svg_id: "radar",
+                width: 1450,
+                height: 1000,
+                colors: {
+                    background: "#fff",
+                    grid: "#bbb",
+                    inactive: "#ddd"
+                },
 
-          title: "Progressive SPA Radar",
+                title: "Progressive SPA Tech Radar",
 
-          // displays clockwise from lower right
-          quadrants: [
-            { name: "Languages" },
-            { name: "Infrastructure" },
-            { name: "Frameworks" },
-            { name: "Data Management" }
-          ],
+                // displays clockwise from lower right
+                quadrants: [
+                    { name: "Progressive Enterprise" },
+                    { name: "Industry" },
+                    { name: "CL Business" },
+                    { name: "ITCL Platform" }
+                ],
 
-          rings: [
-            { name: "ADOPT",  color: "#008000" }, // was #f4c7c3
-            { name: "TRIAL",  color: "#1FBED6" }, // #fce8b2
-            { name: "ASSESS", color: "#fab000" }, // #b7e1cd
-            { name: "HOLD",  color: "#ffff00" }, // #93c47d
-          ],
+                rings: [
+                    { name: "ADOPT", color: "#626520" }, // was #f4c7c3
+                    { name: "TRIAL", color: "#3D91E0" }, // #fce8b2
+                    { name: "ASSESS", color: "#952B60" }, // #b7e1cd
+                    { name: "HOLD", color: "#F1B620" }, // #93c47d
+                ],
 
-          print_layout: true,
+                print_layout: true,
 
-          entries: myEntries
+                entries: myEntries
 
-        }); // rate_visualization
-      }
-
-      function handleFileSelect(){
-        var file = document.getElementById('csvFile').files[0];
-
-        if (file){
-          Papa.parse(file, {
-            header: true,
-            dynamicTyping: true,
-            complete: function(results){
-              let data = results;
-
-              // format the data to pass in to the radar_visualization
-              let entriesArr = [];
-              let ringNum = '';
-              let quadNum = '';
-
-              for (let index = 0; index < data.data.length - 1; index++) {
-                // quadrant assignment
-                switch (data.data[index].quadrant.toUpperCase()){
-                  case 'LANGUAGES': quadNum = 0; break; // lower right
-                  case 'INFRASTRUCTURE': quadNum = 1; break; // lower left
-                  case 'FRAMEWORKS': quadNum = 2; break; // upper left
-                  case 'DATA MANAGEMENT': quadNum = 3; break; // upper right
-                }
-
-                // ring assignment
-                switch (data.data[index].ring.toUpperCase()){
-                  case 'ADOPT': ringNum = 0; break;
-                  case 'TRIAL': ringNum = 1; break;
-                  case 'ASSESS': ringNum = 2; break;
-                  case 'HOLD': ringNum = 3; break;
-                }
-
-                // populate an entry for each iteration
-                entriesArr[index] = {
-                  label: data.data[index].name,
-                  quadrant: quadNum,
-                  ring: ringNum,
-                  moved: data.data[index].moved
-                }
-              }
-
-              drawRadar(entriesArr);
-            }
-          })
+            });
         }
-      }
 
-      $(document).ready(function() {
-        $("#csvFile").change(handleFileSelect);
-      });
+        function handleFileSelect() {
+            var file = document.getElementById('csvFile').files[0];
+
+            if (file) {
+                Papa.parse(file, {
+                    header: true,
+                    dynamicTyping: true,
+                    complete: function (results) {
+                        let data = results;
+
+                        // format the data to pass in to the radar_visualization
+                        let entriesArr = [];
+                        let ringNum = '';
+                        let quadNum = '';
+
+                        for (let index = 0; index < data.data.length - 1; index++) {
+                            // quadrant assignment
+                            switch (data.data[index].quadrant.toUpperCase()) {
+                                case 'PROGRESSIVE ENTERPRISE': quadNum = 0; break; // lower right
+                                case 'INDUSTRY': quadNum = 1; break; // lower left
+                                case 'CL BUSINESS': quadNum = 2; break; // upper left
+                                case 'ITCL PLATFORM': quadNum = 3; break; // upper right
+                            }
+
+                            // ring assignment
+                            switch (data.data[index].ring.toUpperCase()) {
+                                case 'ADOPT': ringNum = 0; break;
+                                case 'TRIAL': ringNum = 1; break;
+                                case 'ASSESS': ringNum = 2; break;
+                                case 'HOLD': ringNum = 3; break;
+                            }
+
+                            // populate an entry for each iteration
+                            entriesArr[index] = {
+                                label: data.data[index].name,
+                                quadrant: quadNum,
+                                ring: ringNum,
+                                moved: data.data[index].moved,
+                                expandedText: data.data[index].expandedText,
+                                link: data.data[index].link
+                            }
+                        }
+
+                        drawRadar(entriesArr);
+                    }
+                })
+            }
+        }
+
+        $(document).ready(function () {
+            $("#csvFile").change(handleFileSelect);
+        });
     </script>
-    <link rel="stylesheet" type="text/css" href="../css/radar.css" media="screen"/>
-  </head>
 
-  <body>
+    <link rel="stylesheet" type="text/css" href="../TechRadarPOC/css/radar.css" media="screen" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+</head>
+
+<body>
     <svg id="radar"></svg>
     <div class="margin-left-50">
-    <form class="form-inline" id="submitCSVForm" onsubmit="handleFileSelect()">
-      <div class="form-group">
-        <label for="files">Upload a CSV formatted file:</label>
-    	  <input type="file" id="csvFile"  class="form-control" accept=".csv" required />
-    	</div>
-    	<div class="form-group">
-        <button type="submit" id="submit-file" class="btn btn-primary">Upload File</button>
-      </div>
-    </form>
-  </div>
-  </body>
+        <form class="form-inline" id="submitCSVForm" onsubmit="handleFileSelect()">
+            <div class="form-group">
+                <label for="files">Upload a CSV formatted file:</label>
+                <input type="file" id="csvFile" class="form-control" accept=".csv" required />
+            </div>
+            <div class="form-group">
+                <button type="submit" id="submit-file" class="btn btn-primary">Upload File</button>
+            </div>
+        </form>
+    </div>
+</body>
 </HTML>
