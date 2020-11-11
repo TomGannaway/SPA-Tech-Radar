@@ -1,24 +1,39 @@
 // THE SOFTWARE.
+function displayAdditionalInfoText(id, text) {
+    let clickInstructionsId = id + 'ClickInstructions';
+
+    $(id).html(text);
+    if ($(id).css('opacity') == 0) $(id).css('opacity', 1);
+    else $(id).css('opacity', 0);
+
+    // click instructions
+    $(clickInstructionsId).html('(Click label again to make text disappear.)');
+    if ($(clickInstructionsId).css('opacity') == 0) $(clickInstructionsId).css('opacity', 1);
+    else $(clickInstructionsId).css('opacity', 0);
+}
+
+function mouseOverCircle(id, quadrant, ring) {
+    var legendId = '#legend-' + id + '-' + quadrant + '-' + ring;
+    var circleId = '#circle-' + id + '-' + quadrant + '-' + ring;
+    var color = $(circleId).attr('fill');
+    $(legendId).attr('fill', color);
+    $(legendId).css('font-weight', '800');
+}
+
+function mouseOutCircle(id, quadrant, ring) {
+    var legendId = '#legend-' + id + '-' + quadrant + '-' + ring;
+    $(legendId).removeAttr('fill');
+    $(legendId).css('font-weight', 'normal');
+}
+
 function mouseOverLabel(id, quadrant, ring){
-  var theId = 'circle-'+id+'-'+quadrant+'-'+ring;
-  document.getElementById(theId).setAttribute('r', '16');
+    var theId = 'circle-'+id+'-'+quadrant+'-'+ring;
+    $('#'+theId).attr('r', '19');
 }
 
 function mouseOutLabel(id, quadrant, ring){
-  var theId = 'circle-'+id+'-'+quadrant+'-'+ring;
-  document.getElementById(theId).setAttribute('r', '11');
-}
-
-function mouseOverCircle(id, quadrant, ring){
-  var theId = 'legend-'+id+'-'+quadrant+'-'+ring;
-  document.getElementById(theId).style.fontWeight="bold";
-  document.getElementById(theId).style.textDecoration="underline";
-}
-
-function mouseOutCircle(id, quadrant, ring){
-  var theId = 'legend-'+id+'-'+quadrant+'-'+ring;
-  document.getElementById(theId).style.fontWeight="normal";
-  document.getElementById(theId).style.textDecoration="";
+    var theId = 'circle-'+id+'-'+quadrant+'-'+ring;
+    $('#' + theId).attr('r', '11');
 }
 
 function radar_visualization(config) {
@@ -55,7 +70,7 @@ function radar_visualization(config) {
   ];
 
   const title_offset =
-    { x: -675, y: -420 };
+    { x: -200, y: -420 };
 
   const footer_offset =
     { x: -675, y: 420 };
@@ -253,57 +268,93 @@ function radar_visualization(config) {
     );
   }
 
-  // draw title and legend (only in print layout)
-  if (config.print_layout) {
-
-    // title
-    radar.append("text")
-      .attr("transform", translate(title_offset.x, title_offset.y))
-      .text(config.title)
-      .style("font-family", "Arial, Helvetica")
-      .style("font-size", "34");
-
-    // footer
-    radar.append("text")
-      .attr("transform", translate(footer_offset.x, footer_offset.y))
-      .text("▲ moved up     ▼ moved down")
-      .attr("xml:space", "preserve")
-      .style("font-family", "Arial, Helvetica")
-      .style("font-size", "10");
-
-    // legend
-    var legend = radar.append("g");
-    for (var quadrant = 0; quadrant < 4; quadrant++) {
-      legend.append("text")
-        .attr("transform", translate(
-          legend_offset[quadrant].x,
-          legend_offset[quadrant].y - 45
-        ))
-        .text(config.quadrants[quadrant].name)
-        .style("font-family", "Arial, Helvetica")
-        .style("font-size", "18");
-      for (var ring = 0; ring < 4; ring++) {
-        legend.append("text")
-          .attr("transform", legend_transform(quadrant, ring))
-          .text(config.rings[ring].name)
+    // draw title and legend (only in print layout)
+    if (config.print_layout) {
+        // title
+        radar.append("text")
+          .attr("transform", translate(title_offset.x, title_offset.y))
+          .text(config.title)
           .style("font-family", "Arial, Helvetica")
-          .style("font-size", "12")
-          .style("font-weight", "bold");
-        legend.selectAll(".legend" + quadrant + ring)
-          .data(segmented[quadrant][ring])
-          .enter()
-            .append("text")
-              .attr("id", function(d, i) { return 'legend-' + d.id + '-' + quadrant + '-' + ring })
-              .attr("class", "legend" + quadrant + ring)
-              .attr("transform", function(d, i) { return legend_transform(quadrant, ring, i); })
-              .attr("onmouseover", function(d) { return "mouseOverLabel("+d.id+','+quadrant+','+ring+")"})
-              .attr("onmouseout", function(d) { return "mouseOutLabel("+d.id+','+quadrant+','+ring+")"})
-              .text(function(d, i) { return d.id + ". " + d.label; })
-              .style("font-family", "Arial, Helvetica")
-              .style("font-size", "11");
-      }
+          .style("font-size", "34");
+
+        // legend
+        var legend = radar.append("g");
+        for (var quadrant = 0; quadrant < 4; quadrant++) {
+          legend.append("text")
+            .attr("transform", translate(
+              legend_offset[quadrant].x,
+              legend_offset[quadrant].y - 45
+            ))
+            .text(config.quadrants[quadrant].name)
+            .style("font-family", "Arial, Helvetica")
+            .style("font-size", "18");
+            for (var ring = 0; ring < 4; ring++) {
+                let expandedTextId;
+
+                switch (quadrant) {
+                    case 0: expandedTextId = '#ProgressiveEnterpriseExpandedInfo'; break;
+                    case 1: expandedTextId = '#IndustryExpandedInfo'; break;
+                    case 2: expandedTextId = '#CLBusinessExpandedInfo'; break;
+                    case 3: expandedTextId = '#ITCLPlatformExpandedInfo';
+                }
+
+                legend.append("text")
+                  .attr("transform", legend_transform(quadrant, ring))
+                  .text(config.rings[ring].name)
+                  .style("font-family", "Arial, Helvetica")
+                  .style("font-size", "12")
+                  .style("font-weight", "bold");
+                  legend.selectAll(".legend" + quadrant + ring)
+                      .data(segmented[quadrant][ring])
+                      .enter()
+                      .append("text")
+                      .attr("id", function (d, i) { return 'legend-' + d.id + '-' + quadrant + '-' + ring })
+                      .attr("class", "col-md-5")
+                      .attr("transform", function (d, i) { return legend_transform(quadrant, ring, i); })
+                      .attr("onmouseover", function (d) { return "mouseOverLabel(" + d.id + ',' + quadrant + ',' + ring + ")" })
+                      .attr("onmouseout", function (d) { return "mouseOutLabel(" + d.id + ',' + quadrant + ',' + ring + ")" })
+                      .attr("data-toggle", "collapse")
+                      .attr("data-target", "demo")
+                      .attr("onclick", function (d) { return "displayAdditionalInfoText('" + expandedTextId + "','" + d.expandedText + "')" })
+                      .text(function(d, i) { return d.id + ". " + d.label; })
+                      .style("font-family", "Arial, Helvetica")
+                      .style("font-size", "11")
+            } // for (var ring = 0; ring < 4; ring++)
+        } // for (var quadrant = 0; quadrant < 4; quadrant++)
+
+        // draw the texts that will display additional spreadsheet information then the corresponding label is clicked
+        legend.append("text")
+            .attr("id", "ProgressiveEnterpriseExpandedInfo")
+            .attr("transform", "translate(450, 185)") 
+        legend.append("text")
+            .attr("id", "ProgressiveEnterpriseExpandedInfoClickInstructions")
+            .attr("transform", "translate(450, 200)")
+            .attr("font-style", "italic")
+
+        legend.append("text")
+            .attr("id", "IndustryExpandedInfo")
+            .attr("transform", "translate(-675, 185)") 
+        legend.append("text")
+            .attr("id", "IndustryExpandedInfoClickInstructions")
+            .attr("transform", "translate(-675, 200)")
+            .attr("font-style", "italic")
+
+        legend.append("text")
+            .attr("id", "CLBusinessExpandedInfo")
+            .attr("transform", "translate(-675, -200)") 
+        legend.append("text")
+            .attr("id", "CLBusinessExpandedInfoClickInstructions")
+            .attr("transform", "translate(-675, -185)")
+            .attr("font-style", "italic")
+
+        legend.append("text")
+            .attr("id", "ITCLPlatformExpandedInfo")
+            .attr("transform", "translate(450, -200)") 
+        legend.append("text")
+            .attr("id", "ITCLPlatformExpandedInfoClickInstructions")
+            .attr("transform", "translate(450, -185)")
+            .attr("font-style", "italic")
     }
-  }
 
   // layer for entries
   var rink = radar.append("g")
@@ -367,9 +418,10 @@ function radar_visualization(config) {
     var blip = d3.select(this);
 
     // blip link
-    if (!config.print_layout && d.active && d.hasOwnProperty("link")) {
-      blip = blip.append("a")
-        .attr("xlink:href", d.link);
+    if (d.hasOwnProperty("link")) {
+        blip = blip.append("a")
+            .attr("xlink:href", d.link)
+            .attr("target", "_blank");
     }
 
     // blip shape
